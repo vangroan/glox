@@ -7,8 +7,13 @@ import (
 	"os"
 )
 
-func run(data []byte) {
+func run(source string) {
+	// scanner := newScanner(source)
+	// tokens := scanner.scanTokens()
 
+	// for token := range tokens {
+	// fmt.Println(token)
+	// }
 }
 
 func runFile(filename string) {
@@ -17,7 +22,7 @@ func runFile(filename string) {
 	if err != nil {
 		panic(err)
 	}
-	run(data)
+	run(string(data))
 }
 
 func runRepl() {
@@ -26,7 +31,7 @@ func runRepl() {
 	for {
 		fmt.Print("> ")
 		input, _ := reader.ReadString('\n')
-		fmt.Println(input)
+		run(input)
 	}
 }
 

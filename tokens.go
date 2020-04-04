@@ -131,6 +131,39 @@ func (tt TokenType) String() string {
 		return "NUMBER"
 	case tokenIdent:
 		return "IDENT"
+
+	case tokenAnd:
+		return "AND"
+	case tokenClass:
+		return "CLASS"
+	case tokenElse:
+		return "ELSE"
+	case tokenFalse:
+		return "FALSE"
+	case tokenFunc:
+		return "FUNC"
+	case tokenFor:
+		return "FOR"
+	case tokenIf:
+		return "IF"
+	case tokenNil:
+		return "NIL"
+	case tokenOr:
+		return "OR"
+	case tokenPrint:
+		return "PRINT"
+	case tokenReturn:
+		return "RETURN"
+	case tokenSuper:
+		return "SUPER"
+	case tokenThis:
+		return "THIS"
+	case tokenTrue:
+		return "TRUE"
+	case tokenVar:
+		return "VAR"
+	case tokenWhile:
+		return "WHILE"
 	}
 
 	return ""

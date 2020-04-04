@@ -5,6 +5,27 @@ import (
 	"unicode/utf8"
 )
 
+func keywords() map[string]TokenType {
+	return map[string]TokenType{
+		"and":    tokenAnd,
+		"class":  tokenClass,
+		"else":   tokenElse,
+		"false":  tokenFalse,
+		"for":    tokenFor,
+		"fun":    tokenFunc,
+		"if":     tokenIf,
+		"nil":    tokenNil,
+		"or":     tokenOr,
+		"print":  tokenPrint,
+		"return": tokenReturn,
+		"super":  tokenSuper,
+		"this":   tokenThis,
+		"true":   tokenTrue,
+		"var":    tokenVar,
+		"while":  tokenWhile,
+	}
+}
+
 type Scanner struct {
 	source       string
 	tokens       []Token
@@ -12,6 +33,7 @@ type Scanner struct {
 	current      int
 	line         int
 	errorPrinter ErrorPrinter
+	keywordMap   map[string]TokenType
 }
 
 func newScanner(source string, errorPrinter ErrorPrinter) Scanner {
@@ -22,6 +44,7 @@ func newScanner(source string, errorPrinter ErrorPrinter) Scanner {
 		current:      0,
 		line:         1,
 		errorPrinter: errorPrinter,
+		keywordMap:   keywords(),
 	}
 }
 
@@ -124,7 +147,16 @@ func (scanner *Scanner) identifier() {
 		scanner.advance()
 	}
 
-	scanner.addToken(tokenIdent, nil)
+	// See if the identifier is a reserved word.
+	text := scanner.source[scanner.start:scanner.current]
+
+	if tokenType, ok := scanner.keywordMap[text]; ok {
+		// Keyword
+		scanner.addToken(tokenType, nil)
+	} else {
+		// User defined identifier
+		scanner.addToken(tokenIdent, nil)
+	}
 }
 
 func (scanner *Scanner) scanToken() {

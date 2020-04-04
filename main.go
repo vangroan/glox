@@ -9,6 +9,7 @@ import (
 
 // Lox virtual machine
 type Lox struct {
+	// hadError is to prevent the execution of invalid sourcecode.
 	hadError bool
 }
 
@@ -52,6 +53,7 @@ func (lox Lox) runRepl() {
 		fmt.Print("> ")
 		input, _ := reader.ReadString('\n')
 		lox.run(input)
+		// Reset error state so user can continue using the REPL.
 		lox.hadError = false
 	}
 }

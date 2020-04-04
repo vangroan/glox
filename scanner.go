@@ -1,6 +1,9 @@
 package main
 
-import "unicode/utf8"
+import (
+	"strconv"
+	"unicode/utf8"
+)
 
 type Scanner struct {
 	source       string
@@ -61,6 +64,16 @@ func (scanner Scanner) peek() rune {
 	return runeValue
 }
 
+func (scanner Scanner) peekNext() rune {
+	// Current width
+	_, width := utf8.DecodeRuneInString(scanner.source[scanner.current:])
+	if scanner.current+width >= len(scanner.source) {
+		return rune(0)
+	}
+	runeValue, _ := utf8.DecodeRuneInString(scanner.source[scanner.current+width:])
+	return runeValue
+}
+
 func (scanner *Scanner) stringLiteral() {
 	for scanner.peek() != '"' && !scanner.isAtEnd() {
 		if scanner.peek() == '\n' {
@@ -81,6 +94,29 @@ func (scanner *Scanner) stringLiteral() {
 	// Trim the surrounding quotes
 	val := scanner.source[scanner.start+1 : scanner.current-1]
 	scanner.addToken(tokenString, StringLiteral{value: val})
+}
+
+func (scanner *Scanner) numberLiteral() {
+	for isDigit(scanner.peek()) {
+		scanner.advance()
+	}
+
+	// Look for a fractional part.
+	if scanner.peek() == '.' && isDigit(scanner.peekNext()) {
+		// Consume dot
+		scanner.advance()
+
+		for isDigit(scanner.peek()) {
+			scanner.advance()
+		}
+	}
+
+	value, err := strconv.ParseFloat(scanner.source[scanner.start:scanner.current], 64)
+	if err != nil {
+		panic(err)
+	}
+
+	scanner.addToken(tokenNumber, NumberLiteral{value: value})
 }
 
 func (scanner *Scanner) scanToken() {
@@ -154,7 +190,11 @@ func (scanner *Scanner) scanToken() {
 		break // Ignore
 
 	default:
-		scanner.errorPrinter.printError(scanner.line, "Unexpected character.")
+		if isDigit(c) {
+			scanner.numberLiteral()
+		} else {
+			scanner.errorPrinter.printError(scanner.line, "Unexpected character.")
+		}
 	}
 }
 
@@ -167,4 +207,8 @@ func (scanner *Scanner) scanTokens() []Token {
 
 	scanner.tokens = append(scanner.tokens, newToken(tokenEOF, "", nil, scanner.line))
 	return scanner.tokens
+}
+
+func isDigit(char rune) bool {
+	return char >= '0' && char <= '9'
 }

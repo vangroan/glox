@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type Token struct {
 	tokenType TokenType
 	lexeme    string
@@ -125,6 +127,8 @@ func (tt TokenType) String() string {
 
 	case tokenString:
 		return "STRING"
+	case tokenNumber:
+		return "NUMBER"
 	}
 
 	return ""
@@ -140,4 +144,12 @@ type StringLiteral struct {
 
 func (s StringLiteral) String() string {
 	return s.value
+}
+
+type NumberLiteral struct {
+	value float64
+}
+
+func (s NumberLiteral) String() string {
+	return fmt.Sprintf("%f", s.value)
 }

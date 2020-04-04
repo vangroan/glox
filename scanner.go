@@ -3,20 +3,22 @@ package main
 import "unicode/utf8"
 
 type Scanner struct {
-	source  string
-	tokens  []Token
-	start   int
-	current int
-	line    int
+	source       string
+	tokens       []Token
+	start        int
+	current      int
+	line         int
+	errorPrinter ErrorPrinter
 }
 
-func newScanner(source string) Scanner {
+func newScanner(source string, errorPrinter ErrorPrinter) Scanner {
 	return Scanner{
-		source:  source,
-		tokens:  make([]Token, 0),
-		start:   0,
-		current: 0,
-		line:    1,
+		source:       source,
+		tokens:       make([]Token, 0),
+		start:        0,
+		current:      0,
+		line:         1,
+		errorPrinter: errorPrinter,
 	}
 }
 
@@ -58,6 +60,14 @@ func (scanner *Scanner) scanToken() {
 		scanner.addToken(tokenSemicolon, nil)
 	case '*':
 		scanner.addToken(tokenStar, nil)
+
+	case '\n':
+		break // Ignore
+	case '\r':
+		break // Ignore
+
+	default:
+		scanner.errorPrinter.printError(scanner.line, "Unexpected character.")
 	}
 }
 

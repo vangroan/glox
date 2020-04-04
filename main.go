@@ -18,17 +18,17 @@ func newLox() Lox {
 	}
 }
 
-func (lox Lox) printError(line int, message string) {
+func (lox *Lox) printError(line int, message string) {
 	lox.report(line, "", message)
 }
 
-func (lox Lox) report(line int, where string, message string) {
+func (lox *Lox) report(line int, where string, message string) {
 	fmt.Printf("[line %d] Error %s: %s\n", line, where, message)
 	lox.hadError = true
 }
 
-func (lox Lox) run(source string) {
-	scanner := newScanner(source)
+func (lox *Lox) run(source string) {
+	scanner := newScanner(source, lox)
 	tokens := scanner.scanTokens()
 
 	for _, token := range tokens {
@@ -54,6 +54,10 @@ func (lox Lox) runRepl() {
 		lox.run(input)
 		lox.hadError = false
 	}
+}
+
+type ErrorPrinter interface {
+	printError(line int, message string)
 }
 
 func main() {

@@ -17,17 +17,19 @@ func newToken(tokenType TokenType, lexeme string, literal TokenLiteral, line int
 }
 
 func (token Token) String() string {
-	return string(token.tokenType) + " " + token.lexeme + " " + token.literal.String()
+	if token.literal != nil {
+		return token.tokenType.String() + " " + token.lexeme + " " + token.literal.String()
+	}
+	return token.tokenType.String() + " " + token.lexeme
 }
 
 type TokenType uint
 
 const (
 	tokenEOF TokenType = iota
-)
 
-// Single-character tokens.
-const (
+	// Single-character tokens.
+
 	tokenLeftParen  TokenType = iota
 	tokenRightParen TokenType = iota
 	tokenLeftBrace  TokenType = iota
@@ -39,10 +41,9 @@ const (
 	tokenSemicolon  TokenType = iota
 	tokenSlash      TokenType = iota
 	tokenStar       TokenType = iota
-)
 
-// One or two character tokens.
-const (
+	// One or two character tokens.
+
 	tokenBang         TokenType = iota
 	tokenBangEqual    TokenType = iota
 	tokenEqual        TokenType = iota
@@ -51,17 +52,15 @@ const (
 	tokenGreaterEqual TokenType = iota
 	tokenLess         TokenType = iota
 	tokenLessEqual    TokenType = iota
-)
 
-// Literals.
-const (
+	// Literals.
+
 	tokenIdent  TokenType = iota
 	tokenString TokenType = iota
 	tokenNumber TokenType = iota
-)
 
-// Keywords.
-const (
+	// Keywords.
+
 	tokenAnd    TokenType = iota
 	tokenClass  TokenType = iota
 	tokenElse   TokenType = iota
@@ -79,6 +78,36 @@ const (
 	tokenVar    TokenType = iota
 	tokenWhile  TokenType = iota
 )
+
+func (tt TokenType) String() string {
+	switch tt {
+	case tokenEOF:
+		return "EOF"
+	case tokenLeftParen:
+		return "LEFT_PAREN"
+	case tokenRightParen:
+		return "RIGHT_PAREN"
+	case tokenLeftBrace:
+		return "LEFT_BRACE"
+	case tokenRightBrace:
+		return "RIGHT_BRACE"
+	case tokenComma:
+		return "COMMA"
+	case tokenDot:
+		return "DOT"
+	case tokenMinus:
+		return "MINUS"
+	case tokenPlus:
+		return "PLUS"
+	case tokenSemicolon:
+		return "SEMICOLON"
+	case tokenSlash:
+		return "SLASH"
+	case tokenStar:
+		return "STAR"
+	}
+	return ""
+}
 
 type TokenLiteral interface {
 	String() string

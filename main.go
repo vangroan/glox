@@ -28,12 +28,12 @@ func (lox Lox) report(line int, where string, message string) {
 }
 
 func (lox Lox) run(source string) {
-	// scanner := newScanner(source)
-	// tokens := scanner.scanTokens()
+	scanner := newScanner(source)
+	tokens := scanner.scanTokens()
 
-	// for token := range tokens {
-	// fmt.Println(token)
-	// }
+	for _, token := range tokens {
+		fmt.Println(token.String())
+	}
 }
 
 func (lox Lox) runFile(filename string) {

@@ -1,26 +1,77 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 )
 
-func runFile(filename string) {
-	fmt.Printf("running %s\n", filename)
+// Lox virtual machine
+type Lox struct {
+	// hadError is to prevent the execution of invalid sourcecode.
+	hadError bool
 }
 
-func runRepl() {
+func newLox() Lox {
+	return Lox{
+		hadError: false,
+	}
+}
+
+func (lox *Lox) printError(line int, message string) {
+	lox.report(line, "", message)
+}
+
+func (lox *Lox) report(line int, where string, message string) {
+	fmt.Printf("[line %d] Error %s: %s\n", line, where, message)
+	lox.hadError = true
+}
+
+func (lox *Lox) run(source string) {
+	scanner := newScanner(source, lox)
+	tokens := scanner.scanTokens()
+
+	for _, token := range tokens {
+		fmt.Println(token.String())
+	}
+}
+
+func (lox Lox) runFile(filename string) {
+	fmt.Printf("running %s\n", filename)
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	lox.run(string(data))
+}
+
+func (lox Lox) runRepl() {
 	fmt.Println("REPL")
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Print("> ")
+		input, _ := reader.ReadString('\n')
+		lox.run(input)
+		// Reset error state so user can continue using the REPL.
+		lox.hadError = false
+	}
+}
+
+type ErrorPrinter interface {
+	printError(line int, message string)
 }
 
 func main() {
 	args := os.Args[1:]
+	lox := newLox()
+
 	if len(args) > 1 {
 		fmt.Println("Usage: glox <filename>.lox")
 		os.Exit(64)
 	} else if len(args) == 1 {
-		runFile(args[0])
+		lox.runFile(args[0])
 	} else {
-		runRepl()
+		lox.runRepl()
 	}
 }

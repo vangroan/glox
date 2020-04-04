@@ -1,5 +1,25 @@
 package main
 
+type Token struct {
+	tokenType TokenType
+	lexeme    string
+	literal   TokenLiteral
+	line      int
+}
+
+func newToken(tokenType TokenType, lexeme string, literal TokenLiteral, line int) Token {
+	return Token{
+		tokenType: tokenType,
+		lexeme:    lexeme,
+		literal:   literal,
+		line:      line,
+	}
+}
+
+func (token Token) String() string {
+	return string(token.tokenType) + " " + token.lexeme + " " + token.literal.String()
+}
+
 type TokenType uint
 
 const (
@@ -59,3 +79,7 @@ const (
 	tokenVar    TokenType = iota
 	tokenWhile  TokenType = iota
 )
+
+type TokenLiteral interface {
+	String() string
+}

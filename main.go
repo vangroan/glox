@@ -7,7 +7,27 @@ import (
 	"os"
 )
 
-func run(source string) {
+// Lox virtual machine
+type Lox struct {
+	hadError bool
+}
+
+func newLox() Lox {
+	return Lox{
+		hadError: false,
+	}
+}
+
+func (lox Lox) printError(line int, message string) {
+	lox.report(line, "", message)
+}
+
+func (lox Lox) report(line int, where string, message string) {
+	fmt.Printf("[line %d] Error %s: %s\n", line, where, message)
+	lox.hadError = true
+}
+
+func (lox Lox) run(source string) {
 	// scanner := newScanner(source)
 	// tokens := scanner.scanTokens()
 
@@ -16,33 +36,36 @@ func run(source string) {
 	// }
 }
 
-func runFile(filename string) {
+func (lox Lox) runFile(filename string) {
 	fmt.Printf("running %s\n", filename)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
-	run(string(data))
+	lox.run(string(data))
 }
 
-func runRepl() {
+func (lox Lox) runRepl() {
 	fmt.Println("REPL")
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print("> ")
 		input, _ := reader.ReadString('\n')
-		run(input)
+		lox.run(input)
+		lox.hadError = false
 	}
 }
 
 func main() {
 	args := os.Args[1:]
+	lox := newLox()
+
 	if len(args) > 1 {
 		fmt.Println("Usage: glox <filename>.lox")
 		os.Exit(64)
 	} else if len(args) == 1 {
-		runFile(args[0])
+		lox.runFile(args[0])
 	} else {
-		runRepl()
+		lox.runRepl()
 	}
 }

@@ -37,6 +37,21 @@ func (scanner *Scanner) addToken(tokenType TokenType, literal TokenLiteral) {
 	scanner.tokens = append(scanner.tokens, newToken(tokenType, text, literal, scanner.line))
 }
 
+// Look ahead at the next character.
+func (scanner *Scanner) match(char rune) bool {
+	if scanner.isAtEnd() {
+		return false
+	}
+
+	runeValue, width := utf8.DecodeRuneInString(scanner.source[scanner.current:])
+	if char != runeValue {
+		return false
+	}
+
+	scanner.current += width
+	return true
+}
+
 func (scanner *Scanner) scanToken() {
 	c := scanner.advance()
 	switch c {
@@ -61,9 +76,36 @@ func (scanner *Scanner) scanToken() {
 	case '*':
 		scanner.addToken(tokenStar, nil)
 
+	case '!':
+		if scanner.match('=') {
+			scanner.addToken(tokenBangEqual, nil)
+		} else {
+			scanner.addToken(tokenBang, nil)
+		}
+	case '=':
+		if scanner.match('=') {
+			scanner.addToken(tokenEqualEqual, nil)
+		} else {
+			scanner.addToken(tokenEqual, nil)
+		}
+	case '<':
+		if scanner.match('=') {
+			scanner.addToken(tokenLessEqual, nil)
+		} else {
+			scanner.addToken(tokenLess, nil)
+		}
+	case '>':
+		if scanner.match('=') {
+			scanner.addToken(tokenGreaterEqual, nil)
+		} else {
+			scanner.addToken(tokenGreater, nil)
+		}
+
 	case '\n':
 		break // Ignore
 	case '\r':
+		break // Ignore
+	case ' ':
 		break // Ignore
 
 	default:

@@ -61,6 +61,28 @@ func (scanner Scanner) peek() rune {
 	return runeValue
 }
 
+func (scanner *Scanner) stringLiteral() {
+	for scanner.peek() != '"' && !scanner.isAtEnd() {
+		if scanner.peek() == '\n' {
+			scanner.line++
+		}
+		scanner.advance()
+	}
+
+	// Unterminated string
+	if scanner.isAtEnd() {
+		scanner.errorPrinter.printError(scanner.line, "Unterminated string.")
+		return
+	}
+
+	// Closing quote
+	scanner.advance()
+
+	// Trim the surrounding quotes
+	val := scanner.source[scanner.start+1 : scanner.current-1]
+	scanner.addToken(tokenString, StringLiteral{value: val})
+}
+
 func (scanner *Scanner) scanToken() {
 	c := scanner.advance()
 	switch c {
@@ -119,6 +141,9 @@ func (scanner *Scanner) scanToken() {
 		} else {
 			scanner.addToken(tokenSlash, nil)
 		}
+
+	case '"':
+		scanner.stringLiteral()
 
 	case '\n':
 		scanner.line++

@@ -122,6 +122,9 @@ func (tt TokenType) String() string {
 		return "LESS"
 	case tokenLessEqual:
 		return "LESS_EQUAL"
+
+	case tokenString:
+		return "STRING"
 	}
 
 	return ""
@@ -129,4 +132,12 @@ func (tt TokenType) String() string {
 
 type TokenLiteral interface {
 	String() string
+}
+
+type StringLiteral struct {
+	value string
+}
+
+func (s StringLiteral) String() string {
+	return s.value
 }

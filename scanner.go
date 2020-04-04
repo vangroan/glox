@@ -52,6 +52,15 @@ func (scanner *Scanner) match(char rune) bool {
 	return true
 }
 
+func (scanner Scanner) peek() rune {
+	if scanner.isAtEnd() {
+		return rune(0)
+	}
+
+	runeValue, _ := utf8.DecodeRuneInString(scanner.source[scanner.current:])
+	return runeValue
+}
+
 func (scanner *Scanner) scanToken() {
 	c := scanner.advance()
 	switch c {
@@ -101,10 +110,21 @@ func (scanner *Scanner) scanToken() {
 			scanner.addToken(tokenGreater, nil)
 		}
 
+	case '/':
+		if scanner.match('/') {
+			// A comment goes until the end of the line.
+			for scanner.peek() != '\n' && !scanner.isAtEnd() {
+				scanner.advance()
+			}
+		} else {
+			scanner.addToken(tokenSlash, nil)
+		}
+
 	case '\n':
-		break // Ignore
+		scanner.line++
+
 	case '\r':
-		break // Ignore
+	case '\t':
 	case ' ':
 		break // Ignore
 

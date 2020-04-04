@@ -105,7 +105,25 @@ func (tt TokenType) String() string {
 		return "SLASH"
 	case tokenStar:
 		return "STAR"
+
+	case tokenBang:
+		return "BANG"
+	case tokenBangEqual:
+		return "BANG_EQUAL"
+	case tokenEqual:
+		return "EQUAL"
+	case tokenEqualEqual:
+		return "EQUAL_EQUAL"
+	case tokenGreater:
+		return "GREATER"
+	case tokenGreaterEqual:
+		return "GREATER_EQUAL"
+	case tokenLess:
+		return "LESS"
+	case tokenLessEqual:
+		return "LESS_EQUAL"
 	}
+
 	return ""
 }
 

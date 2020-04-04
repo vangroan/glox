@@ -119,6 +119,14 @@ func (scanner *Scanner) numberLiteral() {
 	scanner.addToken(tokenNumber, NumberLiteral{value: value})
 }
 
+func (scanner *Scanner) identifier() {
+	for isAlphanumeric(scanner.peek()) {
+		scanner.advance()
+	}
+
+	scanner.addToken(tokenIdent, nil)
+}
+
 func (scanner *Scanner) scanToken() {
 	c := scanner.advance()
 	switch c {
@@ -192,6 +200,8 @@ func (scanner *Scanner) scanToken() {
 	default:
 		if isDigit(c) {
 			scanner.numberLiteral()
+		} else if isAlpha(c) {
+			scanner.identifier()
 		} else {
 			scanner.errorPrinter.printError(scanner.line, "Unexpected character.")
 		}
@@ -211,4 +221,14 @@ func (scanner *Scanner) scanTokens() []Token {
 
 func isDigit(char rune) bool {
 	return char >= '0' && char <= '9'
+}
+
+func isAlpha(char rune) bool {
+	return (char >= 'a' && char <= 'z') ||
+		(char >= 'A' && char <= 'Z') ||
+		char == '_'
+}
+
+func isAlphanumeric(char rune) bool {
+	return isAlpha(char) || isDigit(char)
 }

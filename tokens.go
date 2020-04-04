@@ -129,6 +129,8 @@ func (tt TokenType) String() string {
 		return "STRING"
 	case tokenNumber:
 		return "NUMBER"
+	case tokenIdent:
+		return "IDENT"
 	}
 
 	return ""

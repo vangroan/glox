@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 const header string = `// Automatically generated on %s at %s
@@ -12,10 +13,8 @@ const header string = `// Automatically generated on %s at %s
 package main
 `
 
-const baseExpr string = `
+const interfaceExpr string = `
 type Expr interface{}
-
-type BaseExpr struct{}
 `
 
 type exprDef struct {
@@ -34,13 +33,24 @@ func expressions() []exprDef {
 			name:   "Grouping",
 			fields: "base: BaseExpr, expression: Expr",
 		},
+		exprDef{
+			name:   "Literal",
+			fields: "base: BaseExpr, value: TokenLiteral",
+		},
+		exprDef{
+			name:   "Unary",
+			fields: "base: BaseExpr, operator: Token, right: Expr",
+		},
 	}
 }
 
 func generate() string {
 	var sb strings.Builder
 
-	sb.WriteString(header)
+	now := time.Now()
+
+	sb.WriteString(fmt.Sprintf(header, now.Format("2006-01-02"), now.Format("15:04:05 -07:00")))
+	sb.WriteString(interfaceExpr)
 	expr := expressions()
 
 	for _, ex := range expr {

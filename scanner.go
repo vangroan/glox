@@ -159,6 +159,24 @@ func (scanner *Scanner) identifier() {
 	}
 }
 
+// Consumes a multiline comment.
+func (scanner *Scanner) comment() {
+	for scanner.peek() != '*' && scanner.peekNext() != '/' &&
+		!scanner.isAtEnd() {
+		// Continue consuming contents of comment
+		if scanner.peek() == '\n' {
+			scanner.line++
+		}
+		scanner.advance()
+	}
+
+	// Consume closing asterisk and slash
+	scanner.advance()
+	scanner.advance()
+
+	// Note comments are not added as tokens
+}
+
 func (scanner *Scanner) scanToken() {
 	c := scanner.advance()
 	switch c {
@@ -214,6 +232,10 @@ func (scanner *Scanner) scanToken() {
 			for scanner.peek() != '\n' && !scanner.isAtEnd() {
 				scanner.advance()
 			}
+		} else if scanner.match('*') {
+			// Consume asterisk
+			scanner.advance()
+			scanner.comment()
 		} else {
 			scanner.addToken(tokenSlash, nil)
 		}

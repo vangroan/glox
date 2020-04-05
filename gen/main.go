@@ -44,15 +44,32 @@ func expressions() []exprDef {
 	}
 }
 
+func generateVisitor(sb *strings.Builder, exprs []exprDef) {
+	sb.WriteString("\n")
+	sb.WriteString("type ExprVisitor interface {\n")
+	// visitBinary(BinaryExpr) interface{}
+	returnType := "interface{}"
+
+	for _, expr := range exprs {
+		sb.WriteString(fmt.Sprintf("\tvisit%s(%sExpr) %s\n", expr.name, expr.name, returnType))
+	}
+
+	sb.WriteString("}\n")
+}
+
 func generate() string {
 	var sb strings.Builder
 
+	// ======
+	// Header
 	now := time.Now()
 
 	sb.WriteString(fmt.Sprintf(header, now.Format("2006-01-02"), now.Format("15:04:05 -07:00")))
 	sb.WriteString(interfaceExpr)
-	expr := expressions()
 
+	// ===========
+	// Expressions
+	expr := expressions()
 	for _, ex := range expr {
 		sb.WriteString("\n")
 		sb.WriteString(fmt.Sprintf("type %sExpr struct {\n", ex.name))
@@ -68,8 +85,12 @@ func generate() string {
 			}
 		}
 
-		sb.WriteString(fmt.Sprintln("}"))
+		sb.WriteString("}\n")
 	}
+
+	// =======
+	// Visitor
+	generateVisitor(&sb, expr)
 
 	return sb.String()
 }

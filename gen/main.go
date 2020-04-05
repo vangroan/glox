@@ -9,7 +9,7 @@ import (
 
 const header string = `// Automatically generated on %s at %s
 //
-// go run github.com/vangroan/glox/gen
+// go run github.com/vangroan/glox/gen > expr.go
 package main
 `
 
@@ -44,14 +44,12 @@ func expressions() []exprDef {
 	}
 }
 
-func generateVisitor(sb *strings.Builder, exprs []exprDef) {
+func generateVisitor(sb *strings.Builder, exprs []exprDef, returnType string) {
 	sb.WriteString("\n")
 	sb.WriteString("type ExprVisitor interface {\n")
-	// visitBinary(BinaryExpr) interface{}
-	returnType := "interface{}"
 
 	for _, expr := range exprs {
-		sb.WriteString(fmt.Sprintf("\tvisit%s(%sExpr) %s\n", expr.name, expr.name, returnType))
+		sb.WriteString(fmt.Sprintf("	visit%s(%sExpr) %s\n", expr.name, expr.name, returnType))
 	}
 
 	sb.WriteString("}\n")
@@ -59,6 +57,8 @@ func generateVisitor(sb *strings.Builder, exprs []exprDef) {
 
 func generate() string {
 	var sb strings.Builder
+
+	visitorReturns := "interface{}"
 
 	// ======
 	// Header
@@ -71,6 +71,8 @@ func generate() string {
 	// Expressions
 	expr := expressions()
 	for _, ex := range expr {
+		// ------
+		// Struct
 		sb.WriteString("\n")
 		sb.WriteString(fmt.Sprintf("type %sExpr struct {\n", ex.name))
 
@@ -81,16 +83,26 @@ func generate() string {
 				fieldName := strings.TrimSpace(pair[0])
 				fieldType := strings.TrimSpace(pair[1])
 
-				sb.WriteString(fmt.Sprintf("\t%s\t%s\n", fieldName, fieldType))
+				sb.WriteString(fmt.Sprintf("	%s	%s\n", fieldName, fieldType))
 			}
 		}
 
+		sb.WriteString("}\n")
+
+		// ------------
+		// Visit Method
+		self := strings.ToLower(ex.name)
+		sb.WriteString("\n")
+		sb.WriteString(
+			fmt.Sprintf("func (%s %sExpr) accept(visitor ExprVisitor) %s {\n",
+				self, ex.name, visitorReturns))
+		sb.WriteString(fmt.Sprintf("	return visitor.visit%s(%s)\n", ex.name, self))
 		sb.WriteString("}\n")
 	}
 
 	// =======
 	// Visitor
-	generateVisitor(&sb, expr)
+	generateVisitor(&sb, expr, visitorReturns)
 
 	return sb.String()
 }

@@ -1,4 +1,4 @@
-// Automatically generated on 2020-04-06 at 10:50:51 +02:00
+// Automatically generated on 2020-04-06 at 11:03:28 +02:00
 //
 // go run github.com/vangroan/glox/gen > expr.go
 package main
@@ -62,17 +62,21 @@ type ExprVisitor interface {
 type BaseExprVisitor struct{}
 
 func (visitor BaseExprVisitor) visitBinary(expr BinaryExpr) interface{} {
-	return expr.accept(visitor)
+	// Do nothing
+	return nil
 }
 
 func (visitor BaseExprVisitor) visitGrouping(expr GroupingExpr) interface{} {
-	return expr.accept(visitor)
+	// Do nothing
+	return nil
 }
 
 func (visitor BaseExprVisitor) visitLiteral(expr LiteralExpr) interface{} {
-	return expr.accept(visitor)
+	// Do nothing
+	return nil
 }
 
 func (visitor BaseExprVisitor) visitUnary(expr UnaryExpr) interface{} {
-	return expr.accept(visitor)
+	// Do nothing
+	return nil
 }

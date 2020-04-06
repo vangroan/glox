@@ -32,9 +32,19 @@ func (lox *Lox) run(source string) {
 	scanner := newScanner(source, lox)
 	tokens := scanner.scanTokens()
 
+	// Token Print
 	for _, token := range tokens {
 		fmt.Println(token.String())
 	}
+
+	// AST Print
+	root := BinaryExpr{
+		operator: Token{tokenType: tokenStar, lexeme: "*"},
+		left:     LiteralExpr{},
+		right:    LiteralExpr{},
+	}
+	pprint := AstPrinter{}
+	fmt.Println(pprint.Print(root))
 }
 
 func (lox Lox) runFile(filename string) {

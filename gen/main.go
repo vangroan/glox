@@ -68,8 +68,8 @@ func generateVisitor(sb *strings.Builder, exprs []exprDef, returnType string) {
 		sb.WriteString("\n")
 		sb.WriteString(fmt.Sprintf("func (visitor BaseExprVisitor) visit%s(expr %sExpr) %s {\n",
 			expr.name, expr.name, returnType))
-
-		sb.WriteString("	return expr.accept(visitor)")
+		sb.WriteString("	// Do nothing\n")
+		sb.WriteString("	return nil\n")
 		sb.WriteString("}\n")
 	}
 }

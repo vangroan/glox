@@ -14,7 +14,11 @@ package main
 `
 
 const interfaceExpr string = `
-type Expr interface{}
+type Expr interface{
+	accept(ExprVisitor) interface{}
+}
+
+type BaseExpr struct {}
 `
 
 type exprDef struct {
@@ -24,7 +28,6 @@ type exprDef struct {
 
 func expressions() []exprDef {
 	return []exprDef{
-		exprDef{name: "Base", fields: ""},
 		exprDef{
 			name:   "Binary",
 			fields: "base: BaseExpr, left: Expr, operator: Token, right: Expr",
@@ -45,6 +48,8 @@ func expressions() []exprDef {
 }
 
 func generateVisitor(sb *strings.Builder, exprs []exprDef, returnType string) {
+	// =========
+	// Interface
 	sb.WriteString("\n")
 	sb.WriteString("type ExprVisitor interface {\n")
 
@@ -53,6 +58,20 @@ func generateVisitor(sb *strings.Builder, exprs []exprDef, returnType string) {
 	}
 
 	sb.WriteString("}\n")
+
+	// ====
+	// Base
+	sb.WriteString("\n")
+	sb.WriteString("type BaseExprVisitor struct {}\n")
+
+	for _, expr := range exprs {
+		sb.WriteString("\n")
+		sb.WriteString(fmt.Sprintf("func (visitor BaseExprVisitor) visit%s(expr %sExpr) %s {\n",
+			expr.name, expr.name, returnType))
+
+		sb.WriteString("	return expr.accept(visitor)")
+		sb.WriteString("}\n")
+	}
 }
 
 func generate() string {
@@ -75,6 +94,7 @@ func generate() string {
 		// Struct
 		sb.WriteString("\n")
 		sb.WriteString(fmt.Sprintf("type %sExpr struct {\n", ex.name))
+		sb.WriteString("	BaseExpr\n")
 
 		fields := strings.Split(ex.fields, ",")
 		for _, part := range fields {

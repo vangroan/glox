@@ -159,6 +159,36 @@ func (scanner *Scanner) identifier() {
 	}
 }
 
+// Consumes a multiline comment.
+func (scanner *Scanner) comment() {
+	// TODO: Support multiple nestings of comments
+	for scanner.peek() != '*' && scanner.peekNext() != '/' {
+		if scanner.isAtEnd() {
+			scanner.errorPrinter.printError(scanner.line, "Unexpected end of file in comment block")
+			break
+		}
+
+		if scanner.peek() == '\n' {
+			scanner.line++
+		}
+
+		if scanner.peek() == '/' && scanner.peekNext() == '*' {
+			// Nested comments
+			scanner.advance() // Slash
+			scanner.advance() // Asterisk
+			scanner.comment()
+		}
+
+		scanner.advance()
+	}
+
+	// Consume closing asterisk and slash
+	scanner.advance()
+	scanner.advance()
+
+	// Note comments are not added as tokens
+}
+
 func (scanner *Scanner) scanToken() {
 	c := scanner.advance()
 	switch c {
@@ -214,6 +244,10 @@ func (scanner *Scanner) scanToken() {
 			for scanner.peek() != '\n' && !scanner.isAtEnd() {
 				scanner.advance()
 			}
+		} else if scanner.match('*') {
+			// Consume asterisk
+			scanner.advance()
+			scanner.comment()
 		} else {
 			scanner.addToken(tokenSlash, nil)
 		}

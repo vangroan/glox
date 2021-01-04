@@ -32,6 +32,7 @@ func (lox *Lox) run(source string) {
 	scanner := newScanner(source, lox)
 	tokens := scanner.scanTokens()
 
+	// Token Print
 	for _, token := range tokens {
 		fmt.Println(token.String())
 	}
